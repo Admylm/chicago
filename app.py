@@ -3,8 +3,9 @@ import time
 import os
 from telegram import Bot
 
-TELEGRAM_TOKEN = os.environ.get("TELEGRAM_TOKEN")
-CHAT_ID = os.environ.get("CHAT_ID")
+# Environment variable kullanımı
+TELEGRAM_TOKEN = os.environ.get("TELEGRAM_TOKEN")  # Render'de ekle
+CHAT_ID = int(os.environ.get("CHAT_ID", "7456009735"))  # Render'de ekle veya direkt integer
 
 ADDRESSES = [
     "422 W ROSLYN PL",
@@ -18,8 +19,13 @@ ADDRESSES = [
 API_URL = "https://data.cityofchicago.org/resource/v6vf-nfxy.json"
 
 bot = Bot(token=TELEGRAM_TOKEN)
-
 seen_requests = set()
+
+# Deploy sonrası mesaj gönderme
+try:
+    bot.send_message(chat_id=CHAT_ID, text="✅ Bot başarıyla çalışıyor!")
+except Exception as e:
+    print(f"Mesaj gönderilemedi: {e}")
 
 def check_requests():
     for address in ADDRESSES:
@@ -43,11 +49,10 @@ def check_requests():
                         f"Date: {item.get('creation_date')}"
                     )
                     bot.send_message(chat_id=CHAT_ID, text=message)
-        except:
-            pass
+        except Exception as e:
+            print(f"Hata: {e}")
 
 if __name__ == "__main__":
-    bot.send_message(chat_id=CHAT_ID, text="Bot is running!")
     while True:
         check_requests()
         time.sleep(300)
